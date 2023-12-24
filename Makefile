@@ -10,6 +10,7 @@ LDFLAGS       		:= -shared $(LIBS)
 OBJDIR        		:= obj/
 SRCDIR        		:= src/
 LIBDIR 				:= lib/
+BINDIR 				:= bin/
 SRC           		:= $(filter-out $(SRCDIR)$(PYBIND_SOURCE), $(wildcard $(SRCDIR)*.cpp))
 OBJ           		:= $(SRC:$(SRCDIR)%.cpp=$(OBJDIR)%.o)
 
@@ -21,6 +22,7 @@ PYBINDINCLUDE 		:= $(shell python3 -m pybind11 --includes)
 PYCONFIG      		:= $(shell python3-config --extension-suffix)
 MODULE_SHARE_OBJS   := _meshlib${PYCONFIG}
 
+INSTALLDIR = install
 
 .PHONY: all clean
 default: all
@@ -32,7 +34,8 @@ $(shell mkdir -p $(OBJDIR))
 all: $(TARGET) $(MODULE_SHARE_OBJS)
 
 $(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^ $(LIBS)
+	@mkdir -p $(BINDIR)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(BINDIR)$@ $^ $(LIBS)
 
 $(MODULE_SHARE_OBJS): $(SRC) $(SRCDIR)$(PYBIND_SOURCE)
 	@mkdir -p $(LIBDIR)
@@ -47,9 +50,22 @@ demo: $(LIBDIR)$(MODULE_SHARE_OBJS)
 $(OBJDIR)%.o: $(SRCDIR)%.cpp
 	$(CXX) -c $< $(CXXFLAGS) $(INCLUDES) -o $@
 
+# Install
+install: $(BINDIR)$(TARGET) $(LIBDIR)$(MODULE_SHARE_OBJS)
+	@mkdir -p $(INSTALLDIR)/include
+	@mkdir -p $(INSTALLDIR)/bin
+	@mkdir -p $(INSTALLDIR)/lib
+	@mkdir -p $(INSTALLDIR)/python
+	@mkdir -p $(INSTALLDIR)/test
+	cp $(BINDIR)$(TARGET) $(INSTALLDIR)/bin
+	cp -r include/*.h $(INSTALLDIR)/include
+	cp -r $(LIBDIR)* $(INSTALLDIR)/lib
+	cp -r python/* $(INSTALLDIR)/python
+	cp -r test/* $(INSTALLDIR)/test
+
 # Clean
 clean:
-	rm -rf $(OBJDIR) $(LIBDIR) *.o $(TARGET)
+	rm -rf $(OBJDIR) $(LIBDIR) $(BINDIR) $(INSTALLDIR) *.o $(TARGET)
 	find . -name "__pycache__" -type d -exec rm -rf {} +
 	find . -name "*.pyc" -type f -delete
 	find . -name ".pytest_cache" -type d -exec rm -rf {} +

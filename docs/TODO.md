@@ -36,3 +36,6 @@ uv, normal, onBoundary 可以是可读写的，特别是在涉及到UV映射和�
 # install: $(MODULE_SHARE_OBJS)
 # 	@mkdir -p $(LIBDIR)
 # 	mv $^ $(LIBDIR)
+
+
+make -j4
