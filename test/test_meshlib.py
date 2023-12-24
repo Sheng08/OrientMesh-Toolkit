@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.append('.')
+
 import logging
-from utils import bcolors
+from python.utils import bcolors
 import _meshlib
 
 logging.basicConfig(level=logging.INFO)

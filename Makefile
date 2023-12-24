@@ -49,7 +49,7 @@ $(OBJDIR)%.o: $(SRCDIR)%.cpp
 # Python meshlib demo with UI
 export PYTHONPATH=$PYTHONPATH:$(PWD)/$(LIBDIR)
 demo: $(LIBDIR)$(MODULE_SHARE_OBJS)
-	$(PYTHON) demo/demo_meshlib_UI.py
+	$(PYTHON) demo/demo_UI.py
 
 # Python meshlib test
 export PYTHONPATH=$PYTHONPATH:$(PWD)/$(LIBDIR)

@@ -1,0 +1,4 @@
+pybind11
+PySide2
+numpy
+scipy

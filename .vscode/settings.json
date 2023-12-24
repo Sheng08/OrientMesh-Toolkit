@@ -52,5 +52,8 @@
         "typeinfo": "cpp",
         "bit": "cpp",
         "deque": "cpp"
-    }
+    },
+    "python.analysis.extraPaths": [
+        "./python"
+    ]
 }
