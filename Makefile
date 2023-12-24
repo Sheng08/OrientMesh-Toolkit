@@ -1,25 +1,55 @@
-# 變數
-CXX = g++
-CXXFLAGS = -lGL -lGLU -lglut
-OBJDIR = obj/
-SRC = $(filter-out main.cpp, $(wildcard *.cpp))
-OBJ = $(patsubst %.cpp,$(OBJDIR)%.o,$(SRC))
+TARGET 				:= bounding-box
+PYBIND_SOURCE 		:= meshlib_pybind.cpp
 
-# 創建 obj 資料夾
+CXX           		:= g++
+CXXFLAGS      		:= -O3 -Wall -std=c++17 -fPIC
+INCLUDES      		+= -Iinclude -I/usr/include/eigen3 -I$(MKLINCLUDE)
+LIBS          		:= -lGL -lGLU -lglut
+LDFLAGS       		:= -shared $(LIBS)
+
+OBJDIR        		:= obj/
+SRCDIR        		:= src/
+LIBDIR 				:= lib/
+SRC           		:= $(filter-out $(SRCDIR)$(PYBIND_SOURCE), $(wildcard $(SRCDIR)*.cpp))
+OBJ           		:= $(SRC:$(SRCDIR)%.cpp=$(OBJDIR)%.o)
+
+MKLINCLUDE    		:= /usr/include/mkl
+MKLFLAGS      		:= -lblas
+PYTHON        		:= python3
+PYINCLUDE     		:= $(shell python3-config --includes)
+PYBINDINCLUDE 		:= $(shell python3 -m pybind11 --includes)
+PYCONFIG      		:= $(shell python3-config --extension-suffix)
+MODULE_SHARE_OBJS   := _meshlib${PYCONFIG}
+
+
+.PHONY: all clean
+default: all
+
+# Create obj directory
 $(shell mkdir -p $(OBJDIR))
 
-# 目標
-main: main.o $(OBJ)
-	$(CXX) -o $@ $^ $(CXXFLAGS)
+# Target
+all: $(TARGET) $(MODULE_SHARE_OBJS)
 
-# 特殊規則
-$(OBJDIR)main.o: main.cpp
-	$(CXX) -c $< $(CXXFLAGS) -o $@
+$(TARGET): $(OBJ)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $^ $(LIBS)
 
-# 一般規則
-$(OBJDIR)%.o: %.cpp
-	$(CXX) -c $< $(CXXFLAGS) -o $@
+$(MODULE_SHARE_OBJS): $(SRC) $(SRCDIR)$(PYBIND_SOURCE)
+	@mkdir -p $(LIBDIR)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(PYINCLUDE) $(PYBINDINCLUDE) $^ -o $(LIBDIR)$@ $(MKLFLAGS) $(LDFLAGS)
 
-# 清理
+# Python meshlib test
+export PYTHONPATH=$PYTHONPATH:$(PWD)/$(LIBDIR)
+demo: $(LIBDIR)$(MODULE_SHARE_OBJS)
+	$(PYTHON) test/test_meshlib.py
+
+# General rule
+$(OBJDIR)%.o: $(SRCDIR)%.cpp
+	$(CXX) -c $< $(CXXFLAGS) $(INCLUDES) -o $@
+
+# Clean
 clean:
-	rm -rf $(OBJDIR) *.o main
+	rm -rf $(OBJDIR) $(LIBDIR) *.o $(TARGET)
+	find . -name "__pycache__" -type d -exec rm -rf {} +
+	find . -name "*.pyc" -type f -delete
+	find . -name ".pytest_cache" -type d -exec rm -rf {} +

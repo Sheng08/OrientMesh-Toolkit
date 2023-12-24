@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #endif
 
+#include <filesystem>
 #include "Mesh.h"
 #include "BoundingBox.h"
 
@@ -18,14 +19,13 @@ double x = 0;
 double y = 0;
 double z = -2.5;
 
-std::vector<std::string> paths =
-{"/home/Sheng/nsd2023/oriented-bounding-box/gourd.obj",
- "/home/Sheng/nsd2023/oriented-bounding-box/bunny.obj"};
 
 Mesh mesh;
 bool success = true;
 bool drawAABB = true;
 BoundingBox boundingBox;
+
+std::vector<std::string> paths;
 
 void printInstructions()
 {
@@ -166,6 +166,7 @@ void keyboard(unsigned char key, int x0, int y0)
             else boundingBox.computeOrientedBox(mesh.vertices);
             break;
         case 'b':
+        case 'B':
             drawAABB = !drawAABB;
             if (drawAABB) {
                 boundingBox.computeAxisAlignedBox(mesh.vertices);
@@ -176,15 +177,19 @@ void keyboard(unsigned char key, int x0, int y0)
             }
             break;
         case 'a':
+        case 'A':
             x -= 0.03;
             break;
         case 'd':
+        case 'D':
             x += 0.03;
             break;
         case 'w':
+        case 'W':
             y += 0.03;
             break;
         case 's':
+        case 'S':
             y -= 0.03;
             break;
     }
@@ -207,6 +212,27 @@ void special(int i, int x0, int y0)
 }
 
 int main(int argc, char** argv) {
+
+    for (int i = 1; i < argc; ++i) {
+        std::filesystem::path p(argv[i]);
+
+        if (std::filesystem::is_directory(p)) {
+            // If it is a folder, read all .obj files
+            for (const auto & entry : std::filesystem::directory_iterator(p)) {
+                if (entry.path().extension() == ".obj") {
+                    paths.push_back(entry.path());
+                }
+            }
+        } else if (std::filesystem::is_regular_file(p) && p.extension() == ".obj") {
+            // If it is an .obj file, read it directly
+            paths.push_back(p);
+        }
+    }
+
+    if (paths.size() == 0) {
+        std::cerr << "Usage: ./bounding-box <path to mesh (.obj) file or folder>" << std::endl;
+        return 1;
+    }
 
     success = mesh.read(paths[0]);
     if (success) boundingBox.computeAxisAlignedBox(mesh.vertices);

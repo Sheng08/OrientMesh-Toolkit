@@ -1,2 +1,0 @@
-# Oriented Bounding Box
-
