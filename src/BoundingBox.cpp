@@ -140,4 +140,19 @@ void BoundingBox::computeOrientedBox(std::vector<Vertex>& vertices) {
     orientedPoints.push_back(eigenVectors.row(1) * max2);
     orientedPoints.push_back(eigenVectors.row(2) * min3);
     orientedPoints.push_back(eigenVectors.row(2) * max3);
+
+
+    // Print orientedPoints
+    std::cout << "(C++) Oriented Point Xmin: [" << orientedPoints[0].x() << ", " << orientedPoints[0].y() << ", " << orientedPoints[0].z() << "]" << std::endl;
+    std::cout << "(C++) Oriented Point Xmax: [" << orientedPoints[1].x() << ", " << orientedPoints[1].y() << ", " << orientedPoints[1].z() << "]" << std::endl;
+    std::cout << "(C++) Oriented Point Ymin: [" << orientedPoints[2].x() << ", " << orientedPoints[2].y() << ", " << orientedPoints[2].z() << "]" << std::endl;
+    std::cout << "(C++) Oriented Point Ymax: [" << orientedPoints[3].x() << ", " << orientedPoints[3].y() << ", " << orientedPoints[3].z() << "]" << std::endl;
+    std::cout << "(C++) Oriented Point Zmin: [" << orientedPoints[4].x() << ", " << orientedPoints[4].y() << ", " << orientedPoints[4].z() << "]" << std::endl;
+    std::cout << "(C++) Oriented Point Zmax: [" << orientedPoints[5].x() << ", " << orientedPoints[5].y() << ", " << orientedPoints[5].z() << "]" << std::endl;
+    // for (const auto& point : orientedPoints) {
+    //     std::cout << "(C++) Oriented Point: (" << point.x() << ", " << point.y() << ", " << point.z() << ")" << std::endl;
+    // }
+
 }
+
+

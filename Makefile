@@ -24,7 +24,7 @@ MODULE_SHARE_OBJS   := _meshlib${PYCONFIG}
 
 INSTALLDIR = install
 
-.PHONY: all clean
+.PHONY: all clean demo test install
 default: all
 
 # Create obj directory
@@ -37,18 +37,25 @@ $(TARGET): $(OBJ)
 	@mkdir -p $(BINDIR)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(BINDIR)$@ $^ $(LIBS)
 
+# Python module
 $(MODULE_SHARE_OBJS): $(SRC) $(SRCDIR)$(PYBIND_SOURCE)
 	@mkdir -p $(LIBDIR)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(PYINCLUDE) $(PYBINDINCLUDE) $^ -o $(LIBDIR)$@ $(MKLFLAGS) $(LDFLAGS)
 
-# Python meshlib test
-export PYTHONPATH=$PYTHONPATH:$(PWD)/$(LIBDIR)
-demo: $(LIBDIR)$(MODULE_SHARE_OBJS)
-	$(PYTHON) test/test_meshlib.py
-
 # General rule
 $(OBJDIR)%.o: $(SRCDIR)%.cpp
 	$(CXX) -c $< $(CXXFLAGS) $(INCLUDES) -o $@
+
+# Python meshlib demo with UI
+export PYTHONPATH=$PYTHONPATH:$(PWD)/$(LIBDIR)
+demo: $(LIBDIR)$(MODULE_SHARE_OBJS)
+	$(PYTHON) test/demo_meshlib_UI.py
+
+
+# Python meshlib test
+export PYTHONPATH=$PYTHONPATH:$(PWD)/$(LIBDIR)
+test: $(LIBDIR)$(MODULE_SHARE_OBJS)
+	$(PYTHON) test/test_meshlib.py
 
 # Install
 install: $(BINDIR)$(TARGET) $(LIBDIR)$(MODULE_SHARE_OBJS)

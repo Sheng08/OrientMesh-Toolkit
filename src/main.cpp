@@ -5,8 +5,9 @@
 #endif
 
 #include <filesystem>
-#include "Mesh.h"
+
 #include "BoundingBox.h"
+#include "Mesh.h"
 
 int gridX = 600;
 int gridY = 600;
@@ -19,7 +20,6 @@ double x = 0;
 double y = 0;
 double z = -2.5;
 
-
 Mesh mesh;
 bool success = true;
 bool drawAABB = true;
@@ -27,8 +27,7 @@ BoundingBox boundingBox;
 
 std::vector<std::string> paths;
 
-void printInstructions()
-{
+void printInstructions() {
     std::cerr << "space: toggle between meshes\n"
               << "b: toggle between axis aligned and oriented bounding box"
               << "↑/↓: move in/out\n"
@@ -38,16 +37,14 @@ void printInstructions()
               << std::endl;
 }
 
-void init()
-{
+void init() {
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glEnable(GL_DEPTH_TEST);
 }
 
 void drawBox(const Eigen::Vector3d& b1, const Eigen::Vector3d& b2, const Eigen::Vector3d& b3,
              const Eigen::Vector3d& b4, const Eigen::Vector3d& b5, const Eigen::Vector3d& b6,
-             const Eigen::Vector3d& b7, const Eigen::Vector3d& b8)
-{
+             const Eigen::Vector3d& b7, const Eigen::Vector3d& b8) {
     glColor4f(1.0, 1.0, 1.0, 0.6);
 
     glBegin(GL_LINE_LOOP);
@@ -79,11 +76,9 @@ void drawBox(const Eigen::Vector3d& b1, const Eigen::Vector3d& b2, const Eigen::
     glEnd();
 }
 
-void drawFaces()
-{
+void drawFaces() {
     glColor4f(0.0, 0.0, 1.0, 0.6);
     for (FaceCIter f = mesh.faces.begin(); f != mesh.faces.end(); f++) {
-
         if (f->isBoundary()) continue;
 
         glBegin(GL_LINE_LOOP);
@@ -99,8 +94,7 @@ void drawFaces()
     }
 }
 
-void display()
-{
+void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
@@ -152,18 +146,19 @@ void display()
     glutSwapBuffers();
 }
 
-void keyboard(unsigned char key, int x0, int y0)
-{
+void keyboard(unsigned char key, int x0, int y0) {
     switch (key) {
-        case 27 :
+        case 27:
             exit(0);
         case ' ':
             static int i = 0;
             i++;
             if (i == 2) i = 0;
             mesh.read(paths[i]);
-            if (drawAABB) boundingBox.computeAxisAlignedBox(mesh.vertices);
-            else boundingBox.computeOrientedBox(mesh.vertices);
+            if (drawAABB)
+                boundingBox.computeAxisAlignedBox(mesh.vertices);
+            else
+                boundingBox.computeOrientedBox(mesh.vertices);
             break;
         case 'b':
         case 'B':
@@ -197,8 +192,7 @@ void keyboard(unsigned char key, int x0, int y0)
     glutPostRedisplay();
 }
 
-void special(int i, int x0, int y0)
-{
+void special(int i, int x0, int y0) {
     switch (i) {
         case GLUT_KEY_UP:
             z += 0.03;
@@ -212,13 +206,12 @@ void special(int i, int x0, int y0)
 }
 
 int main(int argc, char** argv) {
-
     for (int i = 1; i < argc; ++i) {
         std::filesystem::path p(argv[i]);
 
         if (std::filesystem::is_directory(p)) {
             // If it is a folder, read all .obj files
-            for (const auto & entry : std::filesystem::directory_iterator(p)) {
+            for (const auto& entry : std::filesystem::directory_iterator(p)) {
                 if (entry.path().extension() == ".obj") {
                     paths.push_back(entry.path());
                 }

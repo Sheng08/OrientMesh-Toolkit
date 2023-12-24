@@ -12,7 +12,6 @@ namespace py = pybind11;
 PYBIND11_MODULE(_meshlib, mod) {
     mod.doc() = "Meshlib Python Bindings";
 
-
     py::class_<Mesh>(mod, "Mesh")
         .def(py::init<>())
         .def("read", &Mesh::read)
@@ -53,11 +52,19 @@ PYBIND11_MODULE(_meshlib, mod) {
         .def_readwrite("normal", &HalfEdge::normal)
         .def_readwrite("onBoundary", &HalfEdge::onBoundary);
 
-    // mod.def("load_and_compute_bbox", [](const std::string& filename) {
-    //     Mesh mesh;
-    //     mesh.loadObj(filename);
-    //     BoundingBox bbox;
-    //     bbox.computeAxisAlignedBox(mesh.vertices);
-    //     return bbox;
-    // });
+    mod.def("load_and_compute_axis_aligned_box", [](const std::string& filename) {
+        Mesh mesh;
+        mesh.read(filename);
+        BoundingBox bbox;
+        bbox.computeAxisAlignedBox(mesh.vertices);
+        return bbox;
+    });
+
+    mod.def("load_and_compute_oriented_box", [](const std::string& filename) {
+        Mesh mesh;
+        mesh.read(filename);
+        BoundingBox bbox;
+        bbox.computeOrientedBox(mesh.vertices);
+        return bbox;
+    });
 }
