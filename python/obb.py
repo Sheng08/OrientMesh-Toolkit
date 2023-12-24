@@ -4,8 +4,8 @@ import trimesh
 class BoundingBox:
     def __init__(self, points=None):
         if points is None:
-            self.min = np.array([float('inf')] * 3)
-            self.max = np.array([-float('inf')] * 3)
+            self.min = np.array([0.] * 3)
+            self.max = np.array([0.] * 3)
         else:
             self.min = np.min(points, axis=0)
             self.max = np.max(points, axis=0)

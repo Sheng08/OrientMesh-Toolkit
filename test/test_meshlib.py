@@ -1,72 +1,51 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import sys
 sys.path.append('.')
 
-import logging
-from python.utils import bcolors
 import _meshlib
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-## Initialize MeshLib
+import numpy as np
+import trimesh
+import pytest
+from python.obb import BoundingBox  # 假设您的Python BoundingBox类保存在 bounding_box.py 中
 
 obj_file_path = "assets/bunny.obj"
 
-# Create Mesh object
-mesh = _meshlib.Mesh()
-mesh.read(obj_file_path)
+def load_obj(filename):
+    mesh = trimesh.load(filename)
+    return np.asarray(mesh.vertices)
 
-# Print mesh data
-# print(mesh.vertices)
-# print(mesh.faces)
+@pytest.fixture
+def sample_mesh_vertices():
+    return load_obj(obj_file_path)
 
-# Create BoundingBox object
-bbox = _meshlib.BoundingBox()
+def test_axis_aligned_box(sample_mesh_vertices):
+    # Python Side
+    bbox_py = BoundingBox()
+    bbox_py.compute_axis_aligned_box(sample_mesh_vertices)
 
+    # C++(Pybind) Side
+    bbox_cpp = _meshlib.load_and_compute_axis_aligned_box(obj_file_path)
 
-## Compute AxisAlignedBox
-print(f"\n{bcolors.OKGREEN}{bcolors.BOLD}Compute AxisAlignedBox{bcolors.ENDC}")
-print("=" * 15 + " Use Pybind Module (computeAxisAlignedBox) " + "=" * 15)
-bbox.computeAxisAlignedBox(mesh.vertices)
-print(f"(Python) Mix: {bbox.min}")
-print(f"(Python) Max: {bbox.max}")
+    np.testing.assert_almost_equal(bbox_py.min, bbox_cpp.min)
+    np.testing.assert_almost_equal(bbox_py.max, bbox_cpp.max)
+    np.testing.assert_almost_equal(bbox_py.extent, bbox_cpp.extent)
 
+def test_oriented_box(sample_mesh_vertices):
+    # Python Side
+    bbox_py = BoundingBox()
+    bbox_py.compute_oriented_box(sample_mesh_vertices)
 
-print(f"\n{'=' * 15} Use Integrated Pybind Module (load_and_compute_axis_aligned_box) {'=' * 15}")
-# Call the function to read the OBJ file and calculate the axis-aligned bounding box
-bbox = _meshlib.load_and_compute_axis_aligned_box(obj_file_path)
-min_val = bbox.min
-max_val = bbox.max
-print(f"(Python) Min: {min_val}")
-print(f"(Python) Max: {max_val}")
+    # C++(Pybind) Side
+    bbox_cpp = _meshlib.load_and_compute_oriented_box(obj_file_path)
 
+    for point_py, point_cpp in zip(bbox_py.oriented_points, bbox_cpp.orientedPoints):
+        np.testing.assert_almost_equal(point_py, point_cpp)
 
-## Compute OrientedBox
-print(f"\n{bcolors.OKGREEN}{bcolors.BOLD}Compute OrientedBox{bcolors.ENDC}")
-print("=" * 15 + " Use Pybind Module (computeOrientedBox) " + "=" * 15)
-bbox.computeOrientedBox(mesh.vertices)
-print(f"(Python) Oriented Points Xmin: {[round(coord, 8) for coord in bbox.orientedPoints[0]]}")
-print(f"(Python) Oriented Points Xmax: {[round(coord, 8) for coord in bbox.orientedPoints[1]]}")
-print(f"(Python) Oriented Points Ymin: {[round(coord, 8) for coord in bbox.orientedPoints[2]]}")
-print(f"(Python) Oriented Points Ymax: {[round(coord, 8) for coord in bbox.orientedPoints[3]]}")
-print(f"(Python) Oriented Points Zmin: {[round(coord, 8) for coord in bbox.orientedPoints[4]]}")
-print(f"(Python) Oriented Points Zmax: {[round(coord, 8) for coord in bbox.orientedPoints[5]]}")
-# for idx, point in enumerate(bbox.orientedPoints):
-#     print(f"(Python) Oriented Points: {point.tolist()}")
+def test_empty_bounding_box():
+    # Python Side
+    bbox_py = BoundingBox()
 
+    # C++(Pybind) Side
+    bbox_cpp = _meshlib.BoundingBox()
 
-print(f"\n{'=' * 15} Use Integrated Pybind Module (load_and_compute_oriented_box) {'=' * 15}")
-# Call the function to read the OBJ file and calculate the oriented bounding box
-bbox = _meshlib.load_and_compute_oriented_box(obj_file_path)
-orientedPoints = bbox.orientedPoints
-print(f"(Python) Oriented Points Xmin: {[round(coord, 8) for coord in orientedPoints[0]]}")
-print(f"(Python) Oriented Points Xmax: {[round(coord, 8) for coord in orientedPoints[1]]}")
-print(f"(Python) Oriented Points Ymin: {[round(coord, 8) for coord in orientedPoints[2]]}")
-print(f"(Python) Oriented Points Ymax: {[round(coord, 8) for coord in orientedPoints[3]]}")
-print(f"(Python) Oriented Points Zmin: {[round(coord, 8) for coord in orientedPoints[4]]}")
-print(f"(Python) Oriented Points Zmax: {[round(coord, 8) for coord in orientedPoints[5]]}")
-# for idx, point in enumerate(orientedPoints):
-#     print(f"(Python) )riented Points: {point.tolist()}")
+    np.testing.assert_almost_equal(bbox_cpp.min, bbox_py.min)
+    np.testing.assert_almost_equal(bbox_cpp.max, bbox_py.max)

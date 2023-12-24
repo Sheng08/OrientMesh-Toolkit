@@ -54,7 +54,7 @@ demo: $(LIBDIR)$(MODULE_SHARE_OBJS)
 # Python meshlib test
 export PYTHONPATH=$PYTHONPATH:$(PWD)/$(LIBDIR)
 test: $(LIBDIR)$(MODULE_SHARE_OBJS)
-	$(PYTHON) test/test_meshlib.py
+	$(PYTHON) -m pytest -v test/test_meshlib.py
 
 # Install
 install: $(BINDIR)$(TARGET) $(LIBDIR)$(MODULE_SHARE_OBJS)

@@ -139,7 +139,7 @@ void BoundingBox::computeOrientedBox(std::vector<Vertex>& vertices) {
     std::cout << "(C++) Oriented Point Zmax: [" << orientedPoints[5].x() << ", " << orientedPoints[5].y() << ", " << orientedPoints[5].z() << "]" << std::endl;
 }
 
-/* Old compute have a little fault*/
+/* Old compute have a little fault */
 // void BoundingBox::computeOrientedBox(std::vector<Vertex>& vertices) {
 //     type = "Oriented";
 //     orientedPoints.clear();
