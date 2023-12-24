@@ -14,13 +14,24 @@ PYBIND11_MODULE(_meshlib, mod) {
 
     py::class_<Mesh>(mod, "Mesh")
         .def(py::init<>())
+        .def(py::init<const Mesh&>())
         .def("read", &Mesh::read)
         .def("write", &Mesh::write)
+        .def_readwrite("halfEdges", &Mesh::halfEdges)
         .def_readwrite("vertices", &Mesh::vertices)
-        .def_readwrite("faces", &Mesh::faces);
+        .def_readwrite("uvs", &Mesh::uvs)
+        .def_readwrite("edges", &Mesh::edges)
+        .def_readwrite("faces", &Mesh::faces)
+        .def_readwrite("boundaries", &Mesh::boundaries);
 
     py::class_<BoundingBox>(mod, "BoundingBox")
         .def(py::init<>())
+        .def(py::init<const Eigen::Vector3d&, const Eigen::Vector3d&>())
+        .def(py::init<const Eigen::Vector3d&>())
+        .def("expandToInclude", (void (BoundingBox::*)(const Eigen::Vector3d&)) &BoundingBox::expandToInclude)
+        .def("expandToInclude", (void (BoundingBox::*)(const BoundingBox&)) &BoundingBox::expandToInclude)
+        .def("maxDimension", &BoundingBox::maxDimension)
+        .def("contains", &BoundingBox::contains)
         .def("computeAxisAlignedBox", &BoundingBox::computeAxisAlignedBox)
         .def("computeOrientedBox", &BoundingBox::computeOrientedBox)
         .def_readwrite("min", &BoundingBox::min)
@@ -31,26 +42,33 @@ PYBIND11_MODULE(_meshlib, mod) {
 
     py::class_<Vertex>(mod, "Vertex")
         .def(py::init<>())
+        .def_property_readonly("he", [](const Vertex &v) { return &(*v.he); }, py::return_value_policy::reference_internal)
         .def_readwrite("position", &Vertex::position)
         .def_readwrite("index", &Vertex::index)
-        .def("isIsolated", &Vertex::isIsolated);
+        .def_property_readonly("isIsolated", &Vertex::isIsolated);
 
     py::class_<Face>(mod, "Face")
         .def(py::init<>())
-        .def("isBoundary", &Face::isBoundary)
-        .def("area", &Face::area)
-        .def("normal", &Face::normal);
+        .def_property_readonly("isBoundary", &Face::isBoundary)
+        .def_property_readonly("area", &Face::area)
+        .def_property_readonly("normal", &Face::normal)
+        .def_property_readonly("he", [](const Face& f) { return &(*f.he);}, py::return_value_policy::reference_internal);
+
+    py::class_<Edge>(mod, "Edge")
+        .def(py::init<>())
+        .def_property_readonly("halfEdge", [](const Edge &e) { return &(*e.he); }, py::return_value_policy::reference_internal)
+        .def_property_readonly("length", &Edge::length);
 
     py::class_<HalfEdge>(mod, "HalfEdge")
         .def(py::init<>())
-        .def_readonly("next", &HalfEdge::next)
-        .def_readonly("flip", &HalfEdge::flip)
-        .def_readonly("vertex", &HalfEdge::vertex)
-        .def_readonly("edge", &HalfEdge::edge)
-        .def_readonly("face", &HalfEdge::face)
+        .def_property_readonly("next", [](HalfEdge &he) { return &(*he.next); }, py::return_value_policy::reference_internal)
+        .def_property_readonly("flip", [](HalfEdge &he) { return &(*he.flip); }, py::return_value_policy::reference_internal)
+        .def_property_readonly("vertex", [](HalfEdge &he) { return &(*he.vertex); }, py::return_value_policy::reference_internal)
+        .def_property_readonly("edge", [](HalfEdge &he) { return &(*he.edge); }, py::return_value_policy::reference_internal)
+        .def_property_readonly("face", [](HalfEdge &he) { return &(*he.face); }, py::return_value_policy::reference_internal)
         .def_readwrite("uv", &HalfEdge::uv)
         .def_readwrite("normal", &HalfEdge::normal)
-        .def_readwrite("onBoundary", &HalfEdge::onBoundary);
+        .def_readonly("onBoundary", &HalfEdge::onBoundary);
 
     mod.def("load_and_compute_axis_aligned_box", [](const std::string& filename) {
         Mesh mesh;

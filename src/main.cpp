@@ -173,11 +173,11 @@ void keyboard(unsigned char key, int x0, int y0) {
             break;
         case 'a':
         case 'A':
-            x -= 0.03;
+            x += 0.03;
             break;
         case 'd':
         case 'D':
-            x += 0.03;
+            x -= 0.03;
             break;
         case 'w':
         case 'W':

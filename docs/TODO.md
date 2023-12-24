@@ -39,3 +39,5 @@ uv, normal, onBoundary 可以是可读写的，特别是在涉及到UV映射和�
 
 
 make -j4
+
+ pip install PySide2

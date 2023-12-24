@@ -5,32 +5,37 @@
 
 class BoundingBox {
 public:
-    // default constructor
+    // Default constructor
     BoundingBox();
-    
-    // initialize with specified components
+
+    // Constructor initializing with specified min and max components
     BoundingBox(const Eigen::Vector3d& min0, const Eigen::Vector3d& max0);
-    
-    // initialize with specified components
+
+    // Constructor initializing with a single point
     BoundingBox(const Eigen::Vector3d& p);
-    
-    // expand bounding box to include point/ bbox
+
+    // Destructor
+    virtual ~BoundingBox(){};
+
+    // Expand bounding box to include a point
     void expandToInclude(const Eigen::Vector3d& p);
+
+    // Expand bounding box to include another bounding box
     void expandToInclude(const BoundingBox& b);
-    
-    // return the max dimension
+
+    // Return the maximum dimension of the bounding box
     int maxDimension() const;
-    
-    // check if bounding box and face intersect
+
+    // Check if this bounding box contains another bounding box and calculate the distance
     bool contains(const BoundingBox& boundingBox, double& dist) const;
-    
-    // computes axis aligned bounding box
+
+    // Compute an axis-aligned bounding box from a set of vertices
     void computeAxisAlignedBox(std::vector<Vertex>& vertices);
-    
-    // computes oriented bounding box using principal component analysis
+
+    // Compute an oriented bounding box using principal component analysis from a set of vertices
     void computeOrientedBox(std::vector<Vertex>& vertices);
-        
-    // member variables
+
+    // Member variables
     Eigen::Vector3d min;
     Eigen::Vector3d max;
     Eigen::Vector3d extent;
@@ -38,4 +43,4 @@ public:
     std::string type;
 };
 
-#endif 
+#endif // BOUNDING_BOX_H
