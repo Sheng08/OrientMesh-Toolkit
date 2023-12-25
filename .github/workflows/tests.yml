@@ -1,9 +1,9 @@
-name: CI
+name: Run Tests CI
 
 on:
   push:
     branches:
-      - progress
+      - main
   pull_request:
     branches:
       - main
