@@ -2,6 +2,7 @@
 **/bounding-box
 install/
 bin/
+**/.pytest_cache
 
 
 # Byte-compiled / optimized / DLL files
