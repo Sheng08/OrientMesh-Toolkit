@@ -30,8 +30,7 @@ aims to offer a reliable, optimized, and easily-integrable solution for this
 challenge.
 
 <p align="center">
-    <img src="./doc/pic/OOB_mesh_sample1.png" alt="" height="250"style="margin-right: 15px;"/>
-    <img src="./doc/pic/OOB_mesh_sample2.png" alt="" height="250"/>
+    <img src=".docs/../docs/OrientMesh-Toolkit_demo.gif" alt="" height="250"style="margin-right: 15px;"/>
 </p>
 
 ## Prospective Users
