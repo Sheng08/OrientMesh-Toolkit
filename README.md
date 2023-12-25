@@ -66,31 +66,73 @@ in GUI development and design.
 **Mesh data structure**:
 
 ```cpp
-struct Vertex {
-    glm::vec3 coordinates;
-    glm::vec3 normal;       // Optional
-};
+class Mesh {
+public:
+    // Default constructor
+    Mesh(); 
+    // Copy constructor                             
+    Mesh(const Mesh& mesh);                   
 
-struct Edge {
-    Vertex* start;
-    Vertex* end;
-    std::vector<Face*> faces;
-};
+    // Read mesh from file
+    bool read(const std::string& fileName);  
+    // Write mesh to file
+    bool write(const std::string& fileName);  
 
-struct Face {
-    Vertex* vertices[3];
-    Edge* edges[3];
-    glm::vec3 normal;       // This will facilitate operations that require face normals.
-};
-
-class MeshData {
-    std::vector<Vertex> vertices;
-    std::vector<Edge> edges;
-    std::vector<Face> faces;
-
-    // Additional functions for manipulating and querying the mesh
+    // Mesh components
+    std::vector<HalfEdge> halfEdges;          // Collection of HalfEdges
+    std::vector<Vertex> vertices;             // Vertex list
+    std::vector<Eigen::Vector3d> uvs;         // UV coordinates for texturing
+    std::vector<Eigen::Vector3d> normals;     // Vertex normals
+    std::vector<Edge> edges;                  // Edge list
+    std::vector<Face> faces;                  // Face list
+    std::vector<HalfEdgeIter> boundaries;     // Boundary HalfEdges for open meshes
 };
 ```
+
+**BoundingBox data structure**:
+```cpp
+class BoundingBox {
+public:
+    // Default constructor
+    BoundingBox();
+
+    // Constructor initializing with specified min and max components
+    BoundingBox(const Eigen::Vector3d& min0, const Eigen::Vector3d& max0);
+
+    // Constructor initializing with a single point
+    BoundingBox(const Eigen::Vector3d& p);
+
+    // Destructor
+    virtual ~BoundingBox(){};
+
+    // Expand bounding box to include a point
+    void expandToInclude(const Eigen::Vector3d& p);
+
+    // Expand bounding box to include another bounding box
+    void expandToInclude(const BoundingBox& b);
+
+    // Return the maximum dimension of the bounding box
+    int maxDimension() const;
+
+    // Check if this bounding box contains another bounding box and calculate the distance
+    bool contains(const BoundingBox& boundingBox, double& dist) const;
+
+    // Compute an axis-aligned bounding box from a set of vertices
+    void computeAxisAlignedBox(std::vector<Vertex>& vertices);
+
+    // Compute an oriented bounding box using principal component analysis from a set of vertices
+    void computeOrientedBox(std::vector<Vertex>& vertices);
+
+    // Member variables
+    Eigen::Vector3d min;
+    Eigen::Vector3d max;
+    Eigen::Vector3d extent;
+    std::vector<Eigen::Vector3d> orientedPoints;
+    std::string type;
+};
+```
+
+
 
 **System Flow Description**:
 
@@ -98,8 +140,7 @@ In the OrientMesh workflow, everything begins with the user providing 3D object
 data in the form of a `.obj` file, which encapsulates information about vertices,
 edges, and faces. Initially, this data is ingested and stored by the
 `Mesh` class into specialized C++ data structures. Throughout this
-process, we leverage both the `glm` library (OpenGL Mathematics[^3]) for
-efficient handling of 3D data, and the `Eigen` library[^4] for advanced linear
+process, we leverage the `Eigen` library[^4] for advanced linear
 algebra operations, ensuring both robustness and efficiency.
 
 After that, the parsed data from the `Mesh` class is passed onto the
@@ -110,13 +151,13 @@ vectors of the object's distribution to determine a 3D box that minimally
 encapsulates the object.
 
 Upon completion of the OBB extraction, all data is amalgamated through the
-`OOBInterface` class. Harnessing the power of pybind11 and PyQt, marrying the
+`BoundingBox` class. Harnessing the power of pybind11 and PyQt, marrying the
 efficiency of C++ with the flexibility of Python, this interface acts as a
 bridge between C++ and Python, facilitating users to conveniently access and
 utilize OBB data and its associated operations.
 
 <p align="center">
-    <img src="./doc/pic/system_flow.png" alt="" width="400"/>
+    <img src="docs/sys_arch.png" alt="" width="400"/>
 </p>
 
 ## Algorithm
