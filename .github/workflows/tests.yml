@@ -19,7 +19,7 @@ jobs:
                 sudo apt upgrade -y
                 sudo apt install -y \
                     curl \
-                    git \
+                    git
                 sudo apt -qy install \
                     curl build-essential make \
                     gcc g++ intel-mkl-full \
