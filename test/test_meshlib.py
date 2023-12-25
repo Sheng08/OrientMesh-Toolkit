@@ -5,7 +5,7 @@ import _meshlib
 import numpy as np
 import trimesh
 import pytest
-from python.obb import BoundingBox  # 假设您的Python BoundingBox类保存在 bounding_box.py 中
+from python.obb import BoundingBox
 
 obj_file_path = "assets/bunny.obj"
 
