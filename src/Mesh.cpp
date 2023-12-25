@@ -2,13 +2,30 @@
 
 #include "MeshIO.h"
 
+/**
+ * Default constructor for Mesh.
+ * Initializes an empty Mesh object.
+ */
 Mesh::Mesh() {
 }
 
+/**
+ * Copy constructor for Mesh.
+ * Creates a new Mesh object as a copy of an existing Mesh.
+ * Parameter:
+ *     mesh: const Mesh&, reference to the Mesh object to be copied.
+ */
 Mesh::Mesh(const Mesh& mesh) {
     *this = mesh;
 }
 
+/**
+ * Functionality: Reads mesh data from a file and normalizes the mesh.
+ * Parameter:
+ *     fileName: const std::string&, the name of the file to read from.
+ * Returns:
+ *     bool: Returns true if the file is successfully read, false otherwise.
+ */
 bool Mesh::read(const std::string& fileName) {
     std::ifstream in(fileName.c_str());
 
@@ -25,6 +42,13 @@ bool Mesh::read(const std::string& fileName) {
     return readSuccessful;
 }
 
+/**
+ * Functionality: Writes mesh data to a file.
+ * Parameter:
+ *     fileName: const std::string&, the name of the file to write to.
+ * Returns:
+ *     bool: Returns false as the method currently does not implement successful write checking.
+ */
 bool Mesh::write(const std::string& fileName) {
     std::ofstream out(fileName.c_str());
 
@@ -38,6 +62,10 @@ bool Mesh::write(const std::string& fileName) {
     return false;
 }
 
+/**
+ * Functionality: Normalizes the mesh to fit within a unit sphere centered at the origin.
+ * This method computes the center of mass of the mesh, translates the mesh to the origin, and rescales it.
+ */
 void Mesh::normalize() {
     // compute center of mass
     Eigen::Vector3d cm = Eigen::Vector3d::Zero();

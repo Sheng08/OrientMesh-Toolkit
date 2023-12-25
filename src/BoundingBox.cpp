@@ -5,22 +5,45 @@
 #include "Eigen/Eigenvalues"
 #include "Vertex.h"
 
+
+/**
+ * Default constructor for BoundingBox.
+ * Initializes the bounding box with zero vectors for min, max, and extent.
+ */
 BoundingBox::BoundingBox() : min(Eigen::Vector3d::Zero()),
                              max(Eigen::Vector3d::Zero()),
                              extent(Eigen::Vector3d::Zero()) {
 }
 
+/**
+ * Functionality: Constructor for BoundingBox with specified minimum and maximum points.
+ * Parameter:
+ *     min0: Eigen::Vector3d, specifies the minimum corner of the bounding box.
+ *     max0: Eigen::Vector3d, specifies the maximum corner of the bounding box.
+ * Initializes the extent of the bounding box as the difference between max and min.
+ */
 BoundingBox::BoundingBox(const Eigen::Vector3d& min0, const Eigen::Vector3d& max0) : min(min0),
                                                                                      max(max0) {
     extent = max - min;
 }
 
+/**
+ * Functionality: Constructor for BoundingBox with a single point.
+ * Parameter:
+ *     p: Eigen::Vector3d, initializes both the min and max points of the bounding box.
+ * This constructor is useful for creating a bounding box that starts at a specific point.
+ */
 BoundingBox::BoundingBox(const Eigen::Vector3d& p) : min(p),
                                                      max(p) {
     extent = max - min;
 }
 
-// Overloading
+/**
+ * Functionality: Expands the bounding box to include a given point.
+ * Parameter:
+ *     p: Eigen::Vector3d, the point to include in the bounding box.
+ * Updates the min and max corners of the bounding box if the point extends beyond the current boundaries.
+ */
 void BoundingBox::expandToInclude(const Eigen::Vector3d& p) {
     if (min.x() > p.x()) min.x() = p.x();
     if (min.y() > p.y()) min.y() = p.y();
@@ -33,7 +56,11 @@ void BoundingBox::expandToInclude(const Eigen::Vector3d& p) {
     extent = max - min;
 }
 
-// Overloading
+/**
+ * Functionality: Expands the bounding box to include another bounding box.
+ * Parameter:
+ *     b: BoundingBox, the bounding box to include in this bounding box.
+ */
 void BoundingBox::expandToInclude(const BoundingBox& b) {
     if (min.x() > b.min.x()) min.x() = b.min.x();
     if (min.y() > b.min.y()) min.y() = b.min.y();
@@ -46,6 +73,14 @@ void BoundingBox::expandToInclude(const BoundingBox& b) {
     extent = max - min;
 }
 
+/**
+ * Functionality: Identifies the largest dimension of the bounding box.
+ * This method is used to find the longest extent of the bounding box along the X, Y, and Z axes.
+ * Returns:
+ *     int: The index of the largest dimension (0 for X, 1 for Y, 2 for Z). Returns -1 if the bounding box is oriented.
+ * Note:
+ *     This method is particularly useful in scenarios where the major axis of the bounding box is needed, such as in spatial partitioning or bounding box comparisons.
+ */
 int BoundingBox::maxDimension() const {
     if (type == "Oriented") {
         return -1;
@@ -58,6 +93,14 @@ int BoundingBox::maxDimension() const {
     return result;
 }
 
+/**
+ * Functionality: Checks if the current bounding box completely contains another bounding box.
+ * Parameters:
+ *     boundingBox: BoundingBox, the bounding box to be checked for containment.
+ *     dist: double&, reference to a double where the distance between the centers of the two bounding boxes is stored.
+ * Returns:
+ *     bool: Returns true if the current bounding box completely contains the specified bounding box, false otherwise.
+ */
 bool BoundingBox::contains(const BoundingBox& boundingBox, double& dist) const {
     Eigen::Vector3d bMin = boundingBox.min;
     Eigen::Vector3d bMax = boundingBox.max;
@@ -73,6 +116,12 @@ bool BoundingBox::contains(const BoundingBox& boundingBox, double& dist) const {
     return false;
 }
 
+/**
+ * Functionality: Computes the axis-aligned bounding box for a set of vertices.
+ * Parameter:
+ *     vertices: std::vector<Vertex>, the vertices to be enclosed in the bounding box.
+ * Sets the type to "Axis Aligned" and adjusts the min and max points to enclose all vertices.
+ */
 void BoundingBox::computeAxisAlignedBox(std::vector<Vertex>& vertices) {
     type = "Axis Aligned";
 
@@ -89,7 +138,12 @@ void BoundingBox::computeAxisAlignedBox(std::vector<Vertex>& vertices) {
     std::cout << "(C++) Extent: [" << std::fixed << std::setprecision(8) << extent.transpose() << "]" << std::endl;
 }
 
-// Use PCA to compute the oriented bounding box
+/**
+ * Functionality: Computes the oriented bounding box for a set of vertices using PCA.
+ * Parameter:
+ *     vertices: std::vector<Vertex>, the vertices to be enclosed in the bounding box.
+ * Sets the type to "Oriented" and calculates the oriented bounding box that best fits the vertices.
+ */
 void BoundingBox::computeOrientedBox(std::vector<Vertex>& vertices) {
     type = "Oriented";
     orientedPoints.clear();
