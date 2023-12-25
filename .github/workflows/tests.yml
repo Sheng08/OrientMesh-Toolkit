@@ -32,4 +32,5 @@ jobs:
                 pip install -r python/requirements.txt
             - name: Test
               run: |
+                make
                 make test
