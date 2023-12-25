@@ -34,8 +34,11 @@
 
 ### Methods
 
-- `expand_to_include(point: np.ndarray)`: Expands the bounding box to include the given point.
+- `expandToInclude(point: np.ndarray)`: Expands the bounding box to include the given point.
 - `computeAxisAlignedBox(vertices: np.ndarray)`: Computes the axis-aligned bounding box of the given vertices.
+- `computeOrientedBox()`: Computes the oriented bounding box of the `Mesh` object it is called on. The bounding box is returned as a `BoundingBox` object.
+- `load_and_compute_axis_aligned_box(filename: str)`: This function loads a 3D mesh from the given filename and computes its axis-aligned bounding box. The bounding box is returned as a `BoundingBox` object.
+- `load_and_compute_oriented_box(filename: str)`: This function loads a 3D mesh from the given filename and computes its oriented bounding box. The bounding box is returned as a `BoundingBox` object.
 
 ### Properties
 

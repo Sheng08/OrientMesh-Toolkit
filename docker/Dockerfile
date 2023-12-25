@@ -27,10 +27,13 @@ RUN apt-get -q update && \
 
 RUN  rm -rf /var/lib/apt/lists/*
 
-RUN  pip install pybind11 PySide2 numpy scipy pytest
+RUN  pip install pybind11 PySide2 numpy scipy pytest trimesh
 
 # Set the working directory in the container
 WORKDIR /app
+
+# Run make to build the project (Assuming a Makefile is present)
+# RUN make
 
 # Command to run when starting the container
 CMD [ "bash" ]
