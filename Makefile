@@ -1,4 +1,4 @@
-TARGET 				:= bounding-box
+TARGET 			:= bounding-box
 PYBIND_SOURCE 		:= meshlib_pybind.cpp
 
 CXX           		:= g++
@@ -9,8 +9,8 @@ LDFLAGS       		:= -shared $(LIBS)
 
 OBJDIR        		:= obj/
 SRCDIR        		:= src/
-LIBDIR 				:= lib/
-BINDIR 				:= bin/
+LIBDIR 			:= lib/
+BINDIR 			:= bin/
 SRC           		:= $(filter-out $(SRCDIR)$(PYBIND_SOURCE), $(wildcard $(SRCDIR)*.cpp))
 OBJ           		:= $(SRC:$(SRCDIR)%.cpp=$(OBJDIR)%.o)
 
